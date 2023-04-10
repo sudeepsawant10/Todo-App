@@ -3,7 +3,13 @@ package com.sudeep.todoapp.edit;
 public class EditTaskModel {
     long task_id;
     String taskName;
-    boolean is_taskDone;
+    boolean taskDone =false;
+
+    public EditTaskModel(long task_id, String taskName, boolean taskDone) {
+        this.task_id = task_id;
+        this.taskName = taskName;
+        this.taskDone = taskDone;
+    }
 
     public long getTask_id() {
         return task_id;
@@ -21,11 +27,11 @@ public class EditTaskModel {
         this.taskName = taskName;
     }
 
-    public boolean isIs_taskDone() {
-        return is_taskDone;
+    public boolean isTaskDone() {
+        return taskDone;
     }
 
-    public void setIs_taskDone(boolean is_taskDone) {
-        this.is_taskDone = is_taskDone;
+    public void setTaskDone(boolean taskDone) {
+        this.taskDone = taskDone;
     }
 }

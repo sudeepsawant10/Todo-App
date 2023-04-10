@@ -7,6 +7,8 @@ import static com.sudeep.todoapp.home.MainActivity.C_KEY_CHECKLIST_ID;
 import static com.sudeep.todoapp.home.MainActivity.C_KEY_CHECKLIST_TOPIC_NAME;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +28,7 @@ import com.sudeep.todoapp.firebase.FirebaseDbManger;
 import com.sudeep.todoapp.home.HomeCheckListModel;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -35,6 +38,9 @@ public class EditTask extends AppCompatActivity {
     private EditText etCheckListTopicName;
     private Button btnSave;
     private TextView tvEditDate;
+    private RecyclerView rvTaskList;
+    private EditTaskAdaptor editTaskAdaptor;
+    private ArrayList<EditTaskModel> editTaskModelArrayList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +49,20 @@ public class EditTask extends AppCompatActivity {
         etCheckListTopicName = findViewById(R.id.etCheckListTopicName);
         btnSave = findViewById(R.id.btnSave);
         tvEditDate = findViewById(R.id.tvEditDate);
+
+//        Recycler View task list set adaptor
+        rvTaskList = findViewById(R.id.rvTaskList);
+        rvTaskList.setLayoutManager(new LinearLayoutManager(context));
+        EditTaskModel e1 = new EditTaskModel(123, "Task 1", false);
+        EditTaskModel e2 = new EditTaskModel(124, "Task 2", true);
+        EditTaskModel e3 = new EditTaskModel(125, "Task 4", false);
+        EditTaskModel e4 = new EditTaskModel(127, "Task 7", true);
+        editTaskModelArrayList.add(e1);
+        editTaskModelArrayList.add(e2);
+        editTaskModelArrayList.add(e3);
+        editTaskModelArrayList.add(e4);
+        editTaskAdaptor = new EditTaskAdaptor(context, editTaskModelArrayList);
+        rvTaskList.setAdapter(editTaskAdaptor);
 
 //       from Home Main Activity on checklist clicked
         Intent intent = getIntent();
