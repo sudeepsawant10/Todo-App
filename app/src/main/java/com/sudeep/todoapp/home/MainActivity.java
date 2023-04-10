@@ -19,13 +19,18 @@ import com.sudeep.todoapp.firebase.FirebaseDbManger;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements HomeCheckListAdapter.OnSingleCheckListClickListener {
 
     private Context context = this;
     private ImageView ivAddToList;
     private RecyclerView rvCheckList;
     private HomeCheckListAdapter homeCheckListAdapter;
     private ArrayList<HomeCheckListModel> checkListArrayList = new ArrayList<>();
+    // Intent Put Extra Keys
+    public static final String C_KEY_CHECKLIST_ID = "C_KEY_CHECKLIST_ID";
+    public static final String C_KEY_CHECKLIST_TOPIC_NAME = "C_KEY_CHECKLIST_TOPIC_NAME";
+    public static final String C_KEY_CHECKLIST_DATE = "C_KEY_CHECKLIST_DATE";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
         // Set adaptor for recyclerView checkList
         rvCheckList.setLayoutManager(new LinearLayoutManager(context));
 
-        homeCheckListAdapter = new HomeCheckListAdapter(context, checkListArrayList);
+//      onSingleCheckListClick for every checklist to inflate in recycler view
+        homeCheckListAdapter = new HomeCheckListAdapter(context, checkListArrayList, this::onSingleCheckListClick);
         rvCheckList.setAdapter(homeCheckListAdapter);
 
         ivAddToList.setOnClickListener(new View.OnClickListener() {
@@ -78,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
                     checkListArrayList.clear();
                     checkListArrayList.addAll(checkListArray);
                     homeCheckListAdapter.notifyDataSetChanged();
-                    Toast.makeText(context, "Retreive succesfull", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -93,5 +98,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+    // on checklist click implementation
+    //    go to edit screen with data
+    @Override
+    public void onSingleCheckListClick(HomeCheckListModel homeCheckListModel) {
+        String checkListId = String.valueOf(homeCheckListModel.getCheckListId());
+        String checkListTopicName = homeCheckListModel.getCheckListTopicName();
+        String checkListDate = homeCheckListModel.getDate();
+        String date = homeCheckListModel.getDate();
+        Intent intent = new Intent(context, EditTask.class);
+        intent.putExtra("C_KEY_CHECKLIST_ID", checkListId);
+        intent.putExtra("C_KEY_CHECKLIST_TOPIC_NAME", checkListTopicName);
+        intent.putExtra("C_KEY_CHECKLIST_DATE", checkListDate);
+        startActivity(intent);
     }
 }

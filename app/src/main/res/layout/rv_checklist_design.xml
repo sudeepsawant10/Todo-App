@@ -6,6 +6,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/llCheckListEdit"
         android:gravity="center"
         android:orientation="horizontal"
         android:layout_marginVertical="3dp"
