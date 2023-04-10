@@ -17,7 +17,7 @@
             android:layout_weight="3">
 
             <TextView
-                android:id="@+id/topicName"
+                android:id="@+id/tvTopicName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/dimen_2dp"
@@ -29,7 +29,7 @@
                 android:id="@+id/tvCheckListTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/topicName"
+                android:layout_below="@+id/tvTopicName"
                 android:layout_marginLeft="@dimen/dimen_4dp"
                 android:padding="@dimen/dimen_2dp"
                 android:text="@string/created_at_22_09_2021"
