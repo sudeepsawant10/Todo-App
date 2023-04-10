@@ -2,14 +2,20 @@ package com.sudeep.todoapp.edit;
 
 
 
+import static com.sudeep.todoapp.home.MainActivity.C_KEY_CHECKLIST_DATE;
+import static com.sudeep.todoapp.home.MainActivity.C_KEY_CHECKLIST_ID;
+import static com.sudeep.todoapp.home.MainActivity.C_KEY_CHECKLIST_TOPIC_NAME;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -28,6 +34,7 @@ public class EditTask extends AppCompatActivity {
     Context context = this;
     private EditText etCheckListTopicName;
     private Button btnSave;
+    private TextView tvEditDate;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +42,17 @@ public class EditTask extends AppCompatActivity {
 
         etCheckListTopicName = findViewById(R.id.etCheckListTopicName);
         btnSave = findViewById(R.id.btnSave);
+        tvEditDate = findViewById(R.id.tvEditDate);
+
+//       from Home Main Activity on checklist clicked
+        Intent intent = getIntent();
+        if (intent != null){
+            String checkListId = intent.getStringExtra(C_KEY_CHECKLIST_ID);
+            String checkListTopicName = intent.getStringExtra(C_KEY_CHECKLIST_TOPIC_NAME);
+            String checkListDate = intent.getStringExtra(C_KEY_CHECKLIST_DATE);
+            etCheckListTopicName.setText(checkListTopicName);
+            tvEditDate.setText(checkListDate);
+        }
 
         // save the latest/updated checklist
         btnSave.setOnClickListener(new View.OnClickListener() {

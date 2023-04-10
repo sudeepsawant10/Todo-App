@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,10 +19,13 @@ import java.util.ArrayList;
 public class HomeCheckListAdapter extends RecyclerView.Adapter {
     private Context context;
     private ArrayList<HomeCheckListModel> checkListArrayList = new ArrayList<>();
+//    we have declare the listener method in this class so do not impelment
+    private OnSingleCheckListClickListener onSingleCheckListClickListener;
 
-    public HomeCheckListAdapter(Context context, ArrayList<HomeCheckListModel> checkListArrayList) {
+    public HomeCheckListAdapter(Context context, ArrayList<HomeCheckListModel> checkListArrayList, OnSingleCheckListClickListener onSingleCheckListClickListener) {
         this.context = context;
         this.checkListArrayList = checkListArrayList;
+        this.onSingleCheckListClickListener = onSingleCheckListClickListener;
     }
 
     @NonNull
@@ -35,12 +39,18 @@ public class HomeCheckListAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
-        // get ArrayList one by one to set on ViewHolder
+        // get ArrayList one by one to set data on ViewHolder
         HomeCheckListModel homeCheckListModel = checkListArrayList.get(position);
         HomeCheckListViewHolder homeCheckListViewHolder = (HomeCheckListViewHolder) holder;
         homeCheckListViewHolder.tvTopicName.setText(homeCheckListModel.getCheckListTopicName());
         homeCheckListViewHolder.tvCheckListTime.setText(homeCheckListModel.getDate());
         // for edit image button we will require click lister
+        homeCheckListViewHolder.llCheckListEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onSingleCheckListClickListener.onSingleCheckListClick(homeCheckListModel);
+            }
+        });
     }
 
     @Override
@@ -54,11 +64,20 @@ public class HomeCheckListAdapter extends RecyclerView.Adapter {
         private TextView tvTopicName;
         private TextView tvCheckListTime;
         private ImageView ivEditCheckList;
+        private LinearLayout llCheckListEdit;
         public HomeCheckListViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTopicName = itemView.findViewById(R.id.tvTopicName);
             tvCheckListTime = itemView.findViewById(R.id.tvCheckListTime);
             ivEditCheckList = itemView.findViewById(R.id.ivEditCheckList);
+            llCheckListEdit = itemView.findViewById(R.id.llCheckListEdit);
         }
     }
+
+    // click listener for every checklist
+    public interface OnSingleCheckListClickListener {
+//      To get the checklist data using HomeCheckListModel
+        public void onSingleCheckListClick(HomeCheckListModel homeCheckListModel);
+    }
+
 }
