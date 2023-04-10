@@ -34,6 +34,7 @@ public class HomeCheckListAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+
         // get ArrayList one by one to set on ViewHolder
         HomeCheckListModel homeCheckListModel = checkListArrayList.get(position);
         HomeCheckListViewHolder homeCheckListViewHolder = (HomeCheckListViewHolder) holder;

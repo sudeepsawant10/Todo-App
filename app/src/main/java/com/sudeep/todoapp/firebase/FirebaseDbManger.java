@@ -9,8 +9,11 @@ import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.sudeep.todoapp.home.HomeCheckListModel;
 import com.sudeep.todoapp.util.Common;
 
@@ -55,8 +58,25 @@ public class FirebaseDbManger {
                 });
     }
 
+    public static void retrieveAllCheckLists(Context context, FirebaseDbCallbackInterface firebaseDbCallbackInterface){
+        getReference(Common.CL_TX_CHECKLISTS).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long count = snapshot.getChildrenCount();
+                if (count > 0) {
+                    firebaseDbCallbackInterface.onComplete(snapshot.getChildren());
+                }
+                else {
+                    firebaseDbCallbackInterface.onComplete(null);
+                }
+            }
 
-
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                firebaseDbCallbackInterface.onCancel();
+            }
+        });
+    }
 
 
     /* It will be used when method is called by other activity and listner will be use

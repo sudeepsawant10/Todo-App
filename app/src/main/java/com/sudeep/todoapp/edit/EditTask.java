@@ -19,6 +19,9 @@ import com.sudeep.todoapp.R;
 import com.sudeep.todoapp.firebase.FirebaseDbManger;
 import com.sudeep.todoapp.home.HomeCheckListModel;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class EditTask extends AppCompatActivity {
@@ -69,6 +72,13 @@ public class EditTask extends AppCompatActivity {
                 HomeCheckListModel checkListModel = new HomeCheckListModel();
                 checkListModel.setCheckListId(randomId);
                 checkListModel.setCheckListTopicName(checkListTopicName);
+
+                //Get current data and set
+                Date c = Calendar.getInstance().getTime();
+//                System.out.println("Current time => " + c);
+                SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+                String formattedDate = df.format(c);
+                checkListModel.setDate(formattedDate);
 
 //              Add to db, FirebaseDbCallbackInterface to handle the activity things after data added into db
                 FirebaseDbManger.addCheckListToDb(context, randomId_checkListName_string, checkListModel, new FirebaseDbManger.FirebaseDbCallbackInterface() {
