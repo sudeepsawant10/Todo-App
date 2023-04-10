@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         checkListArrayList.add(homeCheckListModel2);
         checkListArrayList.add(homeCheckListModel3);
         checkListArrayList.add(homeCheckListModel4);
+
         homeCheckListAdapter = new HomeCheckListAdapter(context, checkListArrayList);
         rvCheckList.setAdapter(homeCheckListAdapter);
 

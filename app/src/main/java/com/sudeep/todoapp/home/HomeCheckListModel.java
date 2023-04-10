@@ -2,21 +2,24 @@ package com.sudeep.todoapp.home;
 
 
 public class HomeCheckListModel {
-    private long id;
+    private long checkListId;
     private String checkListTopicName, date;
 
-    public HomeCheckListModel(long id, String checkListTopicName, String date) {
-        this.id = id;
+    public HomeCheckListModel() {
+    }
+
+    public HomeCheckListModel(long checkListId, String checkListTopicName, String date) {
+        this.checkListId = checkListId;
         this.checkListTopicName = checkListTopicName;
         this.date = date;
     }
 
-    public long getId() {
-        return id;
+    public long getCheckListId() {
+        return checkListId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setCheckListId(long checkListId) {
+        this.checkListId = checkListId;
     }
 
     public String getCheckListTopicName() {
