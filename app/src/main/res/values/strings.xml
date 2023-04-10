@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Todo App</string>
+    <string name="lecture_at_sith">Lecture at SITH</string>
+    <string name="my_checklist_topics">My Checklist Topics</string>
+    <string name="created_at_22_09_2021">Created at: 22-09-2021</string>
+    <string name="assignment_must_complete">Assignment must complete</string>
+    <string name="need_to_carry_laptop">Need To Carry Laptop</string>
+    <string name="college_tasks">College Tasks</string>
+    <string name="demo_text">demo text</string>
 </resources>
