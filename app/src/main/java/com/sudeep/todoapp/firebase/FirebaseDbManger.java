@@ -14,6 +14,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sudeep.todoapp.edit.EditTaskModel;
 import com.sudeep.todoapp.home.HomeCheckListModel;
 import com.sudeep.todoapp.util.Common;
 
@@ -76,6 +77,47 @@ public class FirebaseDbManger {
                 firebaseDbCallbackInterface.onCancel();
             }
         });
+    }
+
+    public static void addTaskToDb(Context context, String randomId_checkListName_string, String checkListId, EditTaskModel editTaskModel, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
+        getReference(Common.CL_TX_CHECKLISTS).child(randomId_checkListName_string).child(checkListId).child(String.valueOf(editTaskModel.getTask_id()))
+                .setValue((editTaskModel)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        firebaseDbCallbackInterface.onComplete(null);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        firebaseDbCallbackInterface.onError();
+                    }
+                }).addOnCanceledListener(new OnCanceledListener() {
+                    @Override
+                    public void onCanceled() {
+                        firebaseDbCallbackInterface.onCancel();
+                    }
+                });
+    }
+
+    public static void retrieveAllCheckListTasks(Context context, String randomId_checkListName_string, String checkListId, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
+        getReference(Common.CL_TX_CHECKLISTS).child(randomId_checkListName_string).child(checkListId)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        long count = snapshot.getChildrenCount();
+                        if (count > 0) {
+                            firebaseDbCallbackInterface.onComplete(snapshot.getChildren());
+                        }
+                        else {
+                            firebaseDbCallbackInterface.onComplete(null);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        firebaseDbCallbackInterface.onCancel();
+                    }
+                });
     }
 
 

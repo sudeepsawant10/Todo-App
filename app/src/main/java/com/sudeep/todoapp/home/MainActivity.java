@@ -54,16 +54,15 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
             }
         });
 
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        refreshUi();
+        refreshCheckListUi();
     }
 
-    public void refreshUi() {
+    public void refreshCheckListUi() {
 
         FirebaseDbManger.retrieveAllCheckLists(context, new FirebaseDbManger.FirebaseDbCallbackInterface() {
             @Override

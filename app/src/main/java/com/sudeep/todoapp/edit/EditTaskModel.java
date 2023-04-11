@@ -5,6 +5,9 @@ public class EditTaskModel {
     String taskName;
     boolean taskDone =false;
 
+    public EditTaskModel() {
+    }
+
     public EditTaskModel(long task_id, String taskName, boolean taskDone) {
         this.task_id = task_id;
         this.taskName = taskName;
