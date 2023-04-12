@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
         rvCheckList.setLayoutManager(new LinearLayoutManager(context));
 
 //      onSingleCheckListClick for every checklist to inflate in recycler view
-        homeCheckListAdapter = new HomeCheckListAdapter(context, checkListArrayList, this::onSingleCheckListClick);
+        homeCheckListAdapter = new HomeCheckListAdapter(context, checkListArrayList, this);
         rvCheckList.setAdapter(homeCheckListAdapter);
 
         ivAddToList.setOnClickListener(new View.OnClickListener() {
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
 
                     checkListArrayList.clear();
                     checkListArrayList.addAll(checkListArray);
-                    homeCheckListAdapter.notifyDataSetChanged();
+//                    homeCheckListAdapter.notifyDataSetChanged();
                     rvCheckList.scrollToPosition(checkListArrayList.size() - 1);
                 }
             }
@@ -112,5 +112,25 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
         intent.putExtra("C_KEY_CHECKLIST_TOPIC_NAME", checkListTopicName);
         intent.putExtra("C_KEY_CHECKLIST_DATE", checkListDate);
         startActivity(intent);
+    }
+
+    @Override
+    public void onSingleLongClickDelete(HomeCheckListModel homeCheckListModel) {
+        FirebaseDbManger.deleteCheckList(context, homeCheckListModel, new FirebaseDbManger.FirebaseDbCallbackInterface() {
+            @Override
+            public void onComplete(Object object) {
+                Toast.makeText(context, "Checklist Deleted", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError() {
+                Toast.makeText(context, "Failed to delete", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancel() {
+                Toast.makeText(context, "Failed to delete", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

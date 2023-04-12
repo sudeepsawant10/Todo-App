@@ -122,6 +122,28 @@ public class FirebaseDbManger {
                 });
     }
 
+    public static void deleteCheckList(Context context, HomeCheckListModel homeCheckListModel, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
+        String checkListIdReference = String.valueOf(homeCheckListModel.getCheckListId());
+        getReference(Common.CL_TX_CHECKLISTS).child(checkListIdReference).
+                removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        firebaseDbCallbackInterface.onComplete(null);
+                    }
+                })
+                .addOnCanceledListener(new OnCanceledListener() {
+                    @Override
+                    public void onCanceled() {
+                        firebaseDbCallbackInterface.onError();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        firebaseDbCallbackInterface.onCancel();
+                    }
+                });
+    }
+
 
     /* It will be used when method is called by other activity and listner will be use
        to show progess dialog or other thing.  */
