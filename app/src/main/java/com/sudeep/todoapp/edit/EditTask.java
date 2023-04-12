@@ -45,7 +45,6 @@ public class EditTask extends AppCompatActivity {
     private EditTaskAdaptor editTaskAdaptor;
     private ArrayList<EditTaskModel> editTaskModelArrayList = new ArrayList<>();
     private Intent intent = null;
-    private String checkListId=null, checkListTopicName = null, checkListDate=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,124 +66,166 @@ public class EditTask extends AppCompatActivity {
 //      from Home Main Activity on checklist clicked
         intent = getIntent();
         if (intent != null){
-            checkListId = intent.getStringExtra(C_KEY_CHECKLIST_ID);
-            checkListTopicName = intent.getStringExtra(C_KEY_CHECKLIST_TOPIC_NAME);
-            checkListDate = intent.getStringExtra(C_KEY_CHECKLIST_DATE);
+            String checkListId = intent.getStringExtra(C_KEY_CHECKLIST_ID);
+            String checkListTopicName = intent.getStringExtra(C_KEY_CHECKLIST_TOPIC_NAME);
+            String checkListDate = intent.getStringExtra(C_KEY_CHECKLIST_DATE);
             etCheckListTopicName.setText(checkListTopicName);
             tvEditDate.setText(checkListDate);
-        }
 
+            if (checkListId!=null){
+//              get current checklist tasks data from intent and set tasks on the screen
+                String randomId_checkListName_string = buildRandomId_checkListName_string(checkListId, checkListTopicName);
+                FirebaseDbManger.retrieveAllCheckListTasks(context, randomId_checkListName_string, checkListId, new FirebaseDbManger.FirebaseDbCallbackInterface() {
+                    @Override
+                    public void onComplete(Object object) {
+                        if (object == null) {
+                            Toast.makeText(context, "No task exist", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // To add db data into array list
+                            ArrayList<EditTaskModel> taskModelArrayList = new ArrayList<>();
+                            Iterable<DataSnapshot> taskListChildren = (Iterable<DataSnapshot>) object;
+
+                            for (DataSnapshot singleChildren: taskListChildren) {
+                                EditTaskModel singleTaskList = singleChildren.getValue(EditTaskModel.class);
+                                taskModelArrayList.add(singleTaskList);
+                            }
+
+                            editTaskModelArrayList.clear();
+                            editTaskModelArrayList.addAll(taskModelArrayList);
+                            editTaskAdaptor.notifyDataSetChanged();
+                        }
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+                });
+            }
+        }
 
         // save the latest/updated checklist
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String checkListTopicName = etCheckListTopicName.getText().toString();
-
-                if (ValidationHelper.isTextEmpty(checkListTopicName)){
-                    Toast.makeText(context, "Please Enter Checklist Name", Toast.LENGTH_SHORT).show();
-                } else {
-
-                    // Generate id with checklistname and date for checklist and add to db
-                    long randomId = System.currentTimeMillis();
-
-//                  StringBuilder is just like arraylist changeable
-//                  concatenating randomId with checkList name with underscore
-                    StringBuilder randomId_checkListName = new StringBuilder(String.valueOf(randomId));
-                    String randomId_checkListName_string = buildRandomId_checkListName_string(String.valueOf(randomId), checkListTopicName);
-
-//                  create  checklist of user with id and add into db
-                    HomeCheckListModel checkListModel = new HomeCheckListModel();
-                    checkListModel.setCheckListId(randomId);
-                    checkListModel.setCheckListTopicName(checkListTopicName);
-
-                    //Get current data and set
-                    Date c = Calendar.getInstance().getTime();
-//                  System.out.println("Current time => " + c);
-                    SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
-                    String formattedDate = df.format(c);
-                    checkListModel.setDate(formattedDate);
-
-//                  Add to db, FirebaseDbCallbackInterface to handle the activity things after data added into db on save button clicked
-                    FirebaseDbManger.addCheckListToDb(context, randomId_checkListName_string, checkListModel, new FirebaseDbManger.FirebaseDbCallbackInterface() {
-                        @Override
-                        public void onComplete(Object object) {
-                            etCheckListTopicName.setText("");
-                            etCheckListTopicName.clearFocus();
-                            Toast.makeText(context, "CheckList Added", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-
-                        @Override
-                        public void onError() {
-                            Toast.makeText(context, "Failed to Add", Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onCancel() {
-                            Toast.makeText(context, "Failed to Adde", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
+                saveCheckList();
             }
         });
 
 //      On add button clicked save task to that checklist
-
         btnAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Get the text and add to taskListArrayList
-                String taskName = etCheckListTask.getText().toString();
-                long randomTaskId = System.currentTimeMillis();
-
-                if (ValidationHelper.isTextEmpty(taskName)){
-                    Toast.makeText(context, "Please enter the task!", Toast.LENGTH_SHORT).show();
-                } else {
-                    EditTaskModel editTaskModel = new EditTaskModel();
-                    editTaskModel.setTask_id(randomTaskId);
-                    editTaskModel.setTaskName(taskName);
-                    editTaskModel.setTaskDone(false);
-
-                    if (intent != null){
-                        checkListId = intent.getStringExtra(C_KEY_CHECKLIST_ID);
-                        checkListTopicName = intent.getStringExtra(C_KEY_CHECKLIST_TOPIC_NAME);
-                        String randomId_checkListName_string = buildRandomId_checkListName_string(checkListId, checkListTopicName);
-                        FirebaseDbManger.addTaskToDb(context, randomId_checkListName_string, checkListId, editTaskModel, new FirebaseDbManger.FirebaseDbCallbackInterface() {
-                            @Override
-                            public void onComplete(Object object) {
-                                etCheckListTask.setText("");
-                                etCheckListTask.clearFocus();
-                                Toast.makeText(context, "Task added into checklist", Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onError() {
-                                Toast.makeText(context, "Failed to add Task", Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onCancel() {
-                                Toast.makeText(context, "Failed to add Task", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-
-                }
+                saveCheckListTask();
             }
         });
-        
+
+    }
+
+    private void saveCheckListTask() {
+        String taskName = etCheckListTask.getText().toString();
+        long randomTaskId = System.currentTimeMillis();
+
+        if (ValidationHelper.isTextEmpty(taskName)){
+            Toast.makeText(context, "Please enter the task!", Toast.LENGTH_SHORT).show();
+        } else {
+            EditTaskModel editTaskModel = new EditTaskModel();
+            editTaskModel.setTask_id(randomTaskId);
+            editTaskModel.setTaskName(taskName);
+            editTaskModel.setTaskDone(false);
+
+            if (intent != null){
+                String checkListId = intent.getStringExtra(C_KEY_CHECKLIST_ID);
+                String checkListTopicName = intent.getStringExtra(C_KEY_CHECKLIST_TOPIC_NAME);
+                String randomId_checkListName_string = buildRandomId_checkListName_string(checkListId, checkListTopicName);
+                FirebaseDbManger.addTaskToDb(context, randomId_checkListName_string, checkListId, editTaskModel, new FirebaseDbManger.FirebaseDbCallbackInterface() {
+                    @Override
+                    public void onComplete(Object object) {
+                        etCheckListTask.setText("");
+                        etCheckListTask.clearFocus();
+                        Toast.makeText(context, "Task added into checklist", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError() {
+                        Toast.makeText(context, "Failed to add Task", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        Toast.makeText(context, "Failed to add Task", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+        }
+    }
+
+    private void saveCheckList() {
+        String checkListTopicName = etCheckListTopicName.getText().toString();
+
+        if (ValidationHelper.isTextEmpty(checkListTopicName)){
+            Toast.makeText(context, "Please Enter Checklist Name", Toast.LENGTH_SHORT).show();
+        } else {
+
+            // Generate id with checklistname and date for checklist and add to db
+            long randomId = System.currentTimeMillis();
+
+//          StringBuilder is just like arraylist changeable
+//          concatenating randomId with checkList name with underscore
+            String randomIdStr = String.valueOf(randomId);
+            String randomId_checkListName_string = buildRandomId_checkListName_string(randomIdStr, checkListTopicName);
+
+//          create  checklist of user with id and add into db
+            HomeCheckListModel checkListModel = new HomeCheckListModel();
+            checkListModel.setCheckListId(randomId);
+            checkListModel.setCheckListTopicName(checkListTopicName);
+
+            //Get current data and set
+            Date c = Calendar.getInstance().getTime();
+            SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+            String formattedDate = df.format(c);
+            checkListModel.setDate(formattedDate);
+
+//          Add to db, FirebaseDbCallbackInterface to handle the activity things after data added into db on save button clicked
+            FirebaseDbManger.addCheckListToDb(context, randomId_checkListName_string, checkListModel, new FirebaseDbManger.FirebaseDbCallbackInterface() {
+                @Override
+                public void onComplete(Object object) {
+                    etCheckListTopicName.setText("");
+                    etCheckListTopicName.clearFocus();
+                    Toast.makeText(context, "CheckList Added", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+
+                @Override
+                public void onError() {
+                    Toast.makeText(context, "Failed to Add", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onCancel() {
+                    Toast.makeText(context, "Failed to Adde", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (intent != null){
-            refreshTaskUi();
-        }
+
     }
 
-    private String buildRandomId_checkListName_string(String checkListId, String checkListTopicName){
+    public String buildRandomId_checkListName_string(String checkListId, String checkListTopicName){
+        if (checkListTopicName == null){
+            return checkListId;
+        }
         String randomId_checkListName_string;
         StringBuilder randomId_checkListName = new StringBuilder(String.valueOf(checkListId));
         String[] words = checkListTopicName.split("\\s+");
@@ -202,8 +243,8 @@ public class EditTask extends AppCompatActivity {
 
 //    Retrieve all the tasks of checklist
     public void refreshTaskUi(){
-        checkListId = intent.getStringExtra(C_KEY_CHECKLIST_ID);
-        checkListTopicName = intent.getStringExtra(C_KEY_CHECKLIST_TOPIC_NAME);
+        String checkListId = intent.getStringExtra(C_KEY_CHECKLIST_ID);
+        String checkListTopicName = intent.getStringExtra(C_KEY_CHECKLIST_TOPIC_NAME);
         String randomId_checkListName_string = buildRandomId_checkListName_string(checkListId, checkListTopicName);
         FirebaseDbManger.retrieveAllCheckListTasks(context, randomId_checkListName_string, checkListId, new FirebaseDbManger.FirebaseDbCallbackInterface() {
             @Override
