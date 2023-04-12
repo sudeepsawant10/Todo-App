@@ -75,7 +75,7 @@ public class EditTask extends AppCompatActivity {
             if (checkListId!=null){
 //              get current checklist tasks data from intent and set tasks on the screen
                 String randomId_checkListName_string = buildRandomId_checkListName_string(checkListId, checkListTopicName);
-                FirebaseDbManger.retrieveAllCheckListTasks(context, randomId_checkListName_string, checkListId, new FirebaseDbManger.FirebaseDbCallbackInterface() {
+                FirebaseDbManger.retrieveAllCheckListTasks(context, checkListId, new FirebaseDbManger.FirebaseDbCallbackInterface() {
                     @Override
                     public void onComplete(Object object) {
                         if (object == null) {
@@ -113,7 +113,7 @@ public class EditTask extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveCheckList();
+                saveUpdateCheckList();
             }
         });
 
@@ -144,7 +144,7 @@ public class EditTask extends AppCompatActivity {
                 String checkListId = intent.getStringExtra(C_KEY_CHECKLIST_ID);
                 String checkListTopicName = intent.getStringExtra(C_KEY_CHECKLIST_TOPIC_NAME);
                 String randomId_checkListName_string = buildRandomId_checkListName_string(checkListId, checkListTopicName);
-                FirebaseDbManger.addTaskToDb(context, randomId_checkListName_string, checkListId, editTaskModel, new FirebaseDbManger.FirebaseDbCallbackInterface() {
+                FirebaseDbManger.addTaskToDb(context, checkListId, editTaskModel, new FirebaseDbManger.FirebaseDbCallbackInterface() {
                     @Override
                     public void onComplete(Object object) {
                         etCheckListTask.setText("");
@@ -167,20 +167,21 @@ public class EditTask extends AppCompatActivity {
         }
     }
 
-    private void saveCheckList() {
+    private void saveUpdateCheckList() {
         String checkListTopicName = etCheckListTopicName.getText().toString();
 
         if (ValidationHelper.isTextEmpty(checkListTopicName)){
             Toast.makeText(context, "Please Enter Checklist Name", Toast.LENGTH_SHORT).show();
-        } else {
-
+        }
+        else {
+//            CREATE NEW CHECKLIST
             // Generate id with checklistname and date for checklist and add to db
             long randomId = System.currentTimeMillis();
 
 //          StringBuilder is just like arraylist changeable
 //          concatenating randomId with checkList name with underscore
-            String randomIdStr = String.valueOf(randomId);
-            String randomId_checkListName_string = buildRandomId_checkListName_string(randomIdStr, checkListTopicName);
+            String randomIdChecklist = String.valueOf(randomId);
+            String randomId_checkListName_string = buildRandomId_checkListName_string(randomIdChecklist, checkListTopicName);
 
 //          create  checklist of user with id and add into db
             HomeCheckListModel checkListModel = new HomeCheckListModel();
@@ -194,7 +195,7 @@ public class EditTask extends AppCompatActivity {
             checkListModel.setDate(formattedDate);
 
 //          Add to db, FirebaseDbCallbackInterface to handle the activity things after data added into db on save button clicked
-            FirebaseDbManger.addCheckListToDb(context, randomId_checkListName_string, checkListModel, new FirebaseDbManger.FirebaseDbCallbackInterface() {
+            FirebaseDbManger.addCheckListToDb(context, randomIdChecklist, checkListModel, new FirebaseDbManger.FirebaseDbCallbackInterface() {
                 @Override
                 public void onComplete(Object object) {
                     etCheckListTopicName.setText("");
@@ -241,41 +242,4 @@ public class EditTask extends AppCompatActivity {
         return randomId_checkListName_string;
     }
 
-//    Retrieve all the tasks of checklist
-    public void refreshTaskUi(){
-        String checkListId = intent.getStringExtra(C_KEY_CHECKLIST_ID);
-        String checkListTopicName = intent.getStringExtra(C_KEY_CHECKLIST_TOPIC_NAME);
-        String randomId_checkListName_string = buildRandomId_checkListName_string(checkListId, checkListTopicName);
-        FirebaseDbManger.retrieveAllCheckListTasks(context, randomId_checkListName_string, checkListId, new FirebaseDbManger.FirebaseDbCallbackInterface() {
-            @Override
-            public void onComplete(Object object) {
-                if (object == null) {
-                    Toast.makeText(context, "No task exist", Toast.LENGTH_SHORT).show();
-                } else {
-                    // To add db data into array list
-                    ArrayList<EditTaskModel> taskModelArrayList = new ArrayList<>();
-                    Iterable<DataSnapshot> taskListChildren = (Iterable<DataSnapshot>) object;
-
-                    for (DataSnapshot singleChildren: taskListChildren) {
-                        EditTaskModel singleTaskList = singleChildren.getValue(EditTaskModel.class);
-                        taskModelArrayList.add(singleTaskList);
-                    }
-
-                    editTaskModelArrayList.clear();
-                    editTaskModelArrayList.addAll(taskModelArrayList);
-                    editTaskAdaptor.notifyDataSetChanged();
-                }
-            }
-
-            @Override
-            public void onError() {
-
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-        });
-    }
 }

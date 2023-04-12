@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
                     checkListArrayList.clear();
                     checkListArrayList.addAll(checkListArray);
                     homeCheckListAdapter.notifyDataSetChanged();
+                    rvCheckList.scrollToPosition(checkListArrayList.size() - 1);
                 }
             }
 

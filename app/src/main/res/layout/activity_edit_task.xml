@@ -17,6 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="4"
+            android:textStyle="bold"
+            android:inputType="textCapSentences"
             android:id="@+id/etCheckListTopicName"
             android:hint="Enter checklist name"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
@@ -62,6 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/etCheckListTask"
+                android:inputType="textCapSentences"
                 android:hint="Add Task"/>
 
         </com.google.android.material.textfield.TextInputLayout>

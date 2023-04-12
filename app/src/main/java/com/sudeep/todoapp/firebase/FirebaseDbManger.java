@@ -38,8 +38,8 @@ public class FirebaseDbManger {
     }
 
     // On edit screen use
-    public static void addCheckListToDb(Context context, String randomId_checkListName_string, HomeCheckListModel checkListModel, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
-        getReference(Common.CL_TX_CHECKLISTS).child(randomId_checkListName_string).setValue((checkListModel))
+    public static void addCheckListToDb(Context context, String randomIdChecklist, HomeCheckListModel checkListModel, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
+        getReference(Common.CL_TX_CHECKLISTS).child(randomIdChecklist).setValue((checkListModel))
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -79,8 +79,9 @@ public class FirebaseDbManger {
         });
     }
 
-    public static void addTaskToDb(Context context, String randomId_checkListName_string, String checkListId, EditTaskModel editTaskModel, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
-        getReference(Common.CL_TX_CHECKLISTS).child(randomId_checkListName_string).child(checkListId).child(String.valueOf(editTaskModel.getTask_id()))
+    public static void addTaskToDb(Context context, String checkListId, EditTaskModel editTaskModel, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
+        String checkListTaskReference = checkListId+"_tasks";
+        getReference(Common.CL_TX_CHECKLISTS).child(checkListId).child(checkListTaskReference).child(String.valueOf(editTaskModel.getTask_id()))
                 .setValue((editTaskModel)).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -99,8 +100,9 @@ public class FirebaseDbManger {
                 });
     }
 
-    public static void retrieveAllCheckListTasks(Context context, String randomId_checkListName_string, String checkListId, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
-        getReference(Common.CL_TX_CHECKLISTS).child(randomId_checkListName_string).child(checkListId)
+    public static void retrieveAllCheckListTasks(Context context, String checkListId, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
+        String checkListTaskReference = checkListId+"_tasks";
+        getReference(Common.CL_TX_CHECKLISTS).child(checkListId).child(checkListTaskReference)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {

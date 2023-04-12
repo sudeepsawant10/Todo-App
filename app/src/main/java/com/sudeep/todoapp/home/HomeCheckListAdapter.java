@@ -1,6 +1,8 @@
 package com.sudeep.todoapp.home;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,7 @@ public class HomeCheckListAdapter extends RecyclerView.Adapter {
     private ArrayList<HomeCheckListModel> checkListArrayList = new ArrayList<>();
 //    we have declare the listener method in this class so do not impelment
     private OnSingleCheckListClickListener onSingleCheckListClickListener;
+
 
     public HomeCheckListAdapter(Context context, ArrayList<HomeCheckListModel> checkListArrayList, OnSingleCheckListClickListener onSingleCheckListClickListener) {
         this.context = context;
@@ -51,6 +54,7 @@ public class HomeCheckListAdapter extends RecyclerView.Adapter {
                 onSingleCheckListClickListener.onSingleCheckListClick(homeCheckListModel);
             }
         });
+
     }
 
     @Override
@@ -78,6 +82,7 @@ public class HomeCheckListAdapter extends RecyclerView.Adapter {
     public interface OnSingleCheckListClickListener {
 //      To get the checklist data using HomeCheckListModel
         public void onSingleCheckListClick(HomeCheckListModel homeCheckListModel);
+//        public void onSingleLongClick(HomeCheckListModel homeCheckListModel);
     }
 
 }
