@@ -14,6 +14,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sudeep.todoapp.edit.EditTask;
 import com.sudeep.todoapp.edit.EditTaskModel;
 import com.sudeep.todoapp.home.HomeCheckListModel;
 import com.sudeep.todoapp.util.Common;
@@ -139,6 +140,28 @@ public class FirebaseDbManger {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        firebaseDbCallbackInterface.onCancel();
+                    }
+                });
+    }
+
+    public static void markTaskDone(Context context, String checkListId, EditTaskModel editTask, Boolean isDone, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
+        String checkListTaskReference = checkListId+"_tasks";
+        getReference(Common.CL_TX_CHECKLISTS).child(checkListId).child(checkListTaskReference)
+                .child(String.valueOf(editTask.getTask_id())).child("taskDone").setValue(isDone)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        firebaseDbCallbackInterface.onComplete(task);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        firebaseDbCallbackInterface.onError();
+                    }
+                }).addOnCanceledListener(new OnCanceledListener() {
+                    @Override
+                    public void onCanceled() {
                         firebaseDbCallbackInterface.onCancel();
                     }
                 });

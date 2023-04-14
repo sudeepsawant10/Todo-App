@@ -30,13 +30,15 @@ import com.sudeep.todoapp.firebase.FirebaseDbManger;
 import com.sudeep.todoapp.home.HomeCheckListModel;
 import com.sudeep.todoapp.util.ValidationHelper;
 
+import java.text.BreakIterator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class EditTask extends AppCompatActivity {
+public class EditTask extends AppCompatActivity implements EditTaskAdaptor.OnTaskCheckedClickListener{
+    private static final String TAG = "EDITTASK_ACTIVITY";
     private Context context = this;
     private EditText etCheckListTopicName, etCheckListTask;
     private Button btnSave, btnAddTask;
@@ -60,7 +62,7 @@ public class EditTask extends AppCompatActivity {
         rvTaskList = findViewById(R.id.rvTaskList);
         rvTaskList.setLayoutManager(new LinearLayoutManager(context));
 
-        editTaskAdaptor = new EditTaskAdaptor(context, editTaskModelArrayList);
+        editTaskAdaptor = new EditTaskAdaptor(context, editTaskModelArrayList,this);
         rvTaskList.setAdapter(editTaskAdaptor);
 
 //      from Home Main Activity on checklist clicked
@@ -74,12 +76,12 @@ public class EditTask extends AppCompatActivity {
 
             if (checkListId!=null){
 //              get current checklist tasks data from intent and set tasks on the screen
-                String randomId_checkListName_string = buildRandomId_checkListName_string(checkListId, checkListTopicName);
                 FirebaseDbManger.retrieveAllCheckListTasks(context, checkListId, new FirebaseDbManger.FirebaseDbCallbackInterface() {
                     @Override
                     public void onComplete(Object object) {
                         if (object == null) {
                             Toast.makeText(context, "No task exist", Toast.LENGTH_SHORT).show();
+                            return;
                         } else {
                             // To add db data into array list
                             ArrayList<EditTaskModel> taskModelArrayList = new ArrayList<>();
@@ -143,7 +145,6 @@ public class EditTask extends AppCompatActivity {
             if (intent != null){
                 String checkListId = intent.getStringExtra(C_KEY_CHECKLIST_ID);
                 String checkListTopicName = intent.getStringExtra(C_KEY_CHECKLIST_TOPIC_NAME);
-                String randomId_checkListName_string = buildRandomId_checkListName_string(checkListId, checkListTopicName);
                 FirebaseDbManger.addTaskToDb(context, checkListId, editTaskModel, new FirebaseDbManger.FirebaseDbCallbackInterface() {
                     @Override
                     public void onComplete(Object object) {
@@ -181,7 +182,6 @@ public class EditTask extends AppCompatActivity {
 //          StringBuilder is just like arraylist changeable
 //          concatenating randomId with checkList name with underscore
             String randomIdChecklist = String.valueOf(randomId);
-            String randomId_checkListName_string = buildRandomId_checkListName_string(randomIdChecklist, checkListTopicName);
 
 //          create  checklist of user with id and add into db
             HomeCheckListModel checkListModel = new HomeCheckListModel();
@@ -218,9 +218,33 @@ public class EditTask extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    public void onTaskCheckedClick(EditTaskModel editTask, Boolean isDone) {
+        if(intent != null){
+            String checkListId = intent.getStringExtra(C_KEY_CHECKLIST_ID);
+            if (checkListId != null){
+                FirebaseDbManger.markTaskDone(context, checkListId, editTask, isDone, new FirebaseDbManger.FirebaseDbCallbackInterface() {
+                    @Override
+                    public void onComplete(Object object) {
+                        if (isDone == true){
+                            Toast.makeText(context, editTask.getTaskName()+" task completed", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Toast.makeText(context, "Task incomplete", Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
+                    @Override
+                    public void onError() {
+                        Log.e(TAG, "onError: Failed to update task");
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        Log.e(TAG, "onError: Failed to update task");
+                    }
+                });
+            }
+        }
     }
 
     public String buildRandomId_checkListName_string(String checkListId, String checkListTopicName){
@@ -241,5 +265,4 @@ public class EditTask extends AppCompatActivity {
         randomId_checkListName_string = String.valueOf(randomId_checkListName);
         return randomId_checkListName_string;
     }
-
 }

@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
 
                     checkListArrayList.clear();
                     checkListArrayList.addAll(checkListArray);
-//                    homeCheckListAdapter.notifyDataSetChanged();
+                    homeCheckListAdapter.notifyDataSetChanged();
                     rvCheckList.scrollToPosition(checkListArrayList.size() - 1);
                 }
             }
@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
         });
 
     }
+    private Intent intent;
     // on checklist click implementation
     //    go to edit screen with data
     @Override
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
         String checkListTopicName = homeCheckListModel.getCheckListTopicName();
         String checkListDate = homeCheckListModel.getDate();
         String date = homeCheckListModel.getDate();
-        Intent intent = new Intent(context, EditTask.class);
+        intent = new Intent(context, EditTask.class);
         intent.putExtra("C_KEY_CHECKLIST_ID", checkListId);
         intent.putExtra("C_KEY_CHECKLIST_TOPIC_NAME", checkListTopicName);
         intent.putExtra("C_KEY_CHECKLIST_DATE", checkListDate);
@@ -119,6 +120,11 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
         FirebaseDbManger.deleteCheckList(context, homeCheckListModel, new FirebaseDbManger.FirebaseDbCallbackInterface() {
             @Override
             public void onComplete(Object object) {
+//                Intent intent = getIntent();
+                intent.removeExtra(C_KEY_CHECKLIST_ID);
+                intent.removeExtra(C_KEY_CHECKLIST_TOPIC_NAME);
+                intent.removeExtra(C_KEY_CHECKLIST_DATE);
+
                 Toast.makeText(context, "Checklist Deleted", Toast.LENGTH_SHORT).show();
             }
 

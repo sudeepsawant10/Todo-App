@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.helper.widget.Layer;
@@ -17,10 +18,12 @@ import java.util.ArrayList;
 public class EditTaskAdaptor extends RecyclerView.Adapter {
     private Context context;
     private ArrayList<EditTaskModel> editTaskModelArrayList = new ArrayList<>();
+    private OnTaskCheckedClickListener onTaskCheckedClickListener;
 
-    public EditTaskAdaptor(Context context, ArrayList<EditTaskModel> editTaskModelArrayList) {
+    public EditTaskAdaptor(Context context, ArrayList<EditTaskModel> editTaskModelArrayList, OnTaskCheckedClickListener onTaskCheckedClickListener) {
         this.context = context;
         this.editTaskModelArrayList = editTaskModelArrayList;
+        this.onTaskCheckedClickListener = onTaskCheckedClickListener;
     }
 
     @NonNull
@@ -32,11 +35,17 @@ public class EditTaskAdaptor extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        EditTaskModel editTaskModel = editTaskModelArrayList.get(position);
+        EditTaskModel editTask = editTaskModelArrayList.get(position);
         EditTaskViewHolder editTaskViewHolder = (EditTaskViewHolder) holder;
-        editTaskViewHolder.checkBoxTask.setText(editTaskModel.getTaskName());
-        Boolean isTaskDone = editTaskModel.isTaskDone();
+        editTaskViewHolder.checkBoxTask.setText(editTask.getTaskName());
+        Boolean isTaskDone = editTask.isTaskDone();
         editTaskViewHolder.checkBoxTask.setChecked(isTaskDone);
+        editTaskViewHolder.checkBoxTask.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                onTaskCheckedClickListener.onTaskCheckedClick(editTask, isChecked);
+            }
+        });
     }
 
     @Override
@@ -50,6 +59,10 @@ public class EditTaskAdaptor extends RecyclerView.Adapter {
             super(itemView);
             checkBoxTask = itemView.findViewById(R.id.checkboxTask);
         }
+    }
+
+    public interface OnTaskCheckedClickListener{
+        public void onTaskCheckedClick(EditTaskModel editTask, Boolean isDone);
     }
 
 }

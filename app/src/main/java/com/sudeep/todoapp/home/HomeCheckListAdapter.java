@@ -76,7 +76,7 @@ public class HomeCheckListAdapter extends RecyclerView.Adapter {
                         .setNegativeButton("cancel", null)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
-                return false;
+                return true;
             }
         });
 
