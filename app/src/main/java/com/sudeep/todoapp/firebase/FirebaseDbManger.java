@@ -1,7 +1,6 @@
 package com.sudeep.todoapp.firebase;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -9,12 +8,13 @@ import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.sudeep.todoapp.edit.EditTask;
+import com.sudeep.todoapp.User;
 import com.sudeep.todoapp.edit.EditTaskModel;
 import com.sudeep.todoapp.home.HomeCheckListModel;
 import com.sudeep.todoapp.util.Common;
@@ -153,6 +153,26 @@ public class FirebaseDbManger {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         firebaseDbCallbackInterface.onComplete(task);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        firebaseDbCallbackInterface.onError();
+                    }
+                }).addOnCanceledListener(new OnCanceledListener() {
+                    @Override
+                    public void onCanceled() {
+                        firebaseDbCallbackInterface.onCancel();
+                    }
+                });
+    }
+
+    public static void addUserToDb(Context context, FirebaseUser firebaseUser, User user, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
+        getReference(Common.CL_TX_USERS).child(firebaseUser.getUid()).setValue((user)).
+                addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        firebaseDbCallbackInterface.onComplete(null);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override

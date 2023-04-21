@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.sudeep.todoapp.R;
+import com.sudeep.todoapp.SignupActivity;
 import com.sudeep.todoapp.edit.EditTask;
 import com.sudeep.todoapp.firebase.FirebaseDbManger;
 
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
 
         ivAddToList = findViewById(R.id.ivAddToList);
         rvCheckList = findViewById(R.id.rvCheckList);
-
+        startActivity(new Intent(context, SignupActivity.class));
         // Set adaptor for recyclerView checkList
         rvCheckList.setLayoutManager(new LinearLayoutManager(context));
 
