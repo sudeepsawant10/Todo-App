@@ -9,14 +9,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
+import com.sudeep.todoapp.LauncherActivity;
+import com.sudeep.todoapp.LoginActivity;
 import com.sudeep.todoapp.R;
 import com.sudeep.todoapp.SignupActivity;
 import com.sudeep.todoapp.edit.EditTask;
+import com.sudeep.todoapp.firebase.FirebaseAuthManger;
 import com.sudeep.todoapp.firebase.FirebaseDbManger;
+import com.sudeep.todoapp.util.Common;
+import com.sudeep.todoapp.util.PreferenceHelper;
 
 import java.util.ArrayList;
 
@@ -32,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
     public static final String C_KEY_CHECKLIST_TOPIC_NAME = "C_KEY_CHECKLIST_TOPIC_NAME";
     public static final String C_KEY_CHECKLIST_DATE = "C_KEY_CHECKLIST_DATE";
 
+    private ImageView ivLogout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
 
         ivAddToList = findViewById(R.id.ivAddToList);
         rvCheckList = findViewById(R.id.rvCheckList);
-        startActivity(new Intent(context, SignupActivity.class));
         // Set adaptor for recyclerView checkList
         rvCheckList.setLayoutManager(new LinearLayoutManager(context));
 
@@ -52,6 +59,14 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
             public void onClick(View v) {
                 Intent intent = new Intent(context, EditTask.class);
                 startActivity(intent);
+            }
+        });
+
+        ivLogout = findViewById(R.id.ivLogout);
+        ivLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuthManger.signOutUser(context);
             }
         });
 

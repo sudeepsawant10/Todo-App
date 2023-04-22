@@ -1,6 +1,7 @@
 package com.sudeep.todoapp.firebase;
 
 import android.content.Context;
+import android.preference.Preference;
 
 import androidx.annotation.NonNull;
 
@@ -8,6 +9,7 @@ import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -18,6 +20,12 @@ import com.sudeep.todoapp.User;
 import com.sudeep.todoapp.edit.EditTaskModel;
 import com.sudeep.todoapp.home.HomeCheckListModel;
 import com.sudeep.todoapp.util.Common;
+import com.sudeep.todoapp.util.PreferenceHelper;
+
+import org.json.JSONObject;
+
+import java.security.spec.ECField;
+import java.util.Map;
 
 public class FirebaseDbManger {
     // Get instance of firebaseDb to access it from app
@@ -185,6 +193,27 @@ public class FirebaseDbManger {
                         firebaseDbCallbackInterface.onCancel();
                     }
                 });
+    }
+
+    public static void getUserFromDb(Context context, String user_id, FirebaseDbCallbackInterface firebaseDbCallbackInterface){
+        getReference(Common.CL_TX_USERS).child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                try {
+                    JSONObject jsonObject = new JSONObject((Map) snapshot.getValue());
+                    PreferenceHelper.putString(context, Common.C_KEY_APP_LOGIN_VALUES, jsonObject.toString());
+                    firebaseDbCallbackInterface.onComplete(null);
+                }
+                catch (Exception e) {
+                    firebaseDbCallbackInterface.onCancel();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                firebaseDbCallbackInterface.onCancel();
+            }
+        });
     }
 
 
