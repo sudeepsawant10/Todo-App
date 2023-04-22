@@ -28,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.sudeep.todoapp.R;
 import com.sudeep.todoapp.firebase.FirebaseDbManger;
 import com.sudeep.todoapp.home.HomeCheckListModel;
+import com.sudeep.todoapp.util.UserAccountManager;
 import com.sudeep.todoapp.util.ValidationHelper;
 
 import java.text.BreakIterator;
@@ -187,6 +188,11 @@ public class EditTask extends AppCompatActivity implements EditTaskAdaptor.OnTas
             HomeCheckListModel checkListModel = new HomeCheckListModel();
             checkListModel.setCheckListId(randomId);
             checkListModel.setCheckListTopicName(checkListTopicName);
+
+//          get logged in user_id and set to checklist model
+            String user_id = UserAccountManager.getUserId(context);
+            checkListModel.setUser_id(user_id);
+
 
             //Get current data and set
             Date c = Calendar.getInstance().getTime();

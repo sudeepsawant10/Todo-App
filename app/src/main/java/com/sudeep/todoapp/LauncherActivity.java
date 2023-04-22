@@ -22,10 +22,11 @@ public class LauncherActivity extends AppCompatActivity {
         String loginValues = PreferenceHelper.getString(context, Common.C_KEY_APP_LOGIN_VALUES,null);
         if (loginValues != null) {
             Intent intent = new Intent(context, MainActivity.class);
+            finish();
             startActivity(intent);
         } else {
             Intent intent = new Intent(context, LoginActivity.class);
-
+            finish();
             startActivity(intent);
         }
 

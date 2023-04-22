@@ -23,6 +23,7 @@ import com.sudeep.todoapp.firebase.FirebaseAuthManger;
 import com.sudeep.todoapp.firebase.FirebaseDbManger;
 import com.sudeep.todoapp.util.Common;
 import com.sudeep.todoapp.util.PreferenceHelper;
+import com.sudeep.todoapp.util.UserAccountManager;
 
 import java.util.ArrayList;
 
@@ -80,7 +81,8 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
 
     public void refreshCheckListUi() {
 
-        FirebaseDbManger.retrieveAllCheckLists(context, new FirebaseDbManger.FirebaseDbCallbackInterface() {
+        String userId = UserAccountManager.getUserId(context);
+        FirebaseDbManger.retrieveAllUserCheckLists(context, userId, new FirebaseDbManger.FirebaseDbCallbackInterface() {
             @Override
             public void onComplete(Object object) {
                 if (object == null){

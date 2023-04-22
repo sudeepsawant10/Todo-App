@@ -1,7 +1,6 @@
 package com.sudeep.todoapp.firebase;
 
 import android.content.Context;
-import android.preference.Preference;
 
 import androidx.annotation.NonNull;
 
@@ -9,7 +8,6 @@ import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,7 +22,6 @@ import com.sudeep.todoapp.util.PreferenceHelper;
 
 import org.json.JSONObject;
 
-import java.security.spec.ECField;
 import java.util.Map;
 
 public class FirebaseDbManger {
@@ -68,8 +65,8 @@ public class FirebaseDbManger {
                 });
     }
 
-    public static void retrieveAllCheckLists(Context context, FirebaseDbCallbackInterface firebaseDbCallbackInterface){
-        getReference(Common.CL_TX_CHECKLISTS).addValueEventListener(new ValueEventListener() {
+    public static void retrieveAllUserCheckLists(Context context, String userId, FirebaseDbCallbackInterface firebaseDbCallbackInterface){
+        getReference(Common.CL_TX_CHECKLISTS).orderByChild("user_id").equalTo(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 long count = snapshot.getChildrenCount();
