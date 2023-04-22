@@ -9,13 +9,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
+import com.sudeep.todoapp.LauncherActivity;
+import com.sudeep.todoapp.LoginActivity;
 import com.sudeep.todoapp.R;
+import com.sudeep.todoapp.SignupActivity;
 import com.sudeep.todoapp.edit.EditTask;
+import com.sudeep.todoapp.firebase.FirebaseAuthManger;
 import com.sudeep.todoapp.firebase.FirebaseDbManger;
+import com.sudeep.todoapp.util.Common;
+import com.sudeep.todoapp.util.PreferenceHelper;
+import com.sudeep.todoapp.util.UserAccountManager;
 
 import java.util.ArrayList;
 
@@ -31,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
     public static final String C_KEY_CHECKLIST_TOPIC_NAME = "C_KEY_CHECKLIST_TOPIC_NAME";
     public static final String C_KEY_CHECKLIST_DATE = "C_KEY_CHECKLIST_DATE";
 
+    private ImageView ivLogout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,12 +48,11 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
 
         ivAddToList = findViewById(R.id.ivAddToList);
         rvCheckList = findViewById(R.id.rvCheckList);
-
         // Set adaptor for recyclerView checkList
         rvCheckList.setLayoutManager(new LinearLayoutManager(context));
 
 //      onSingleCheckListClick for every checklist to inflate in recycler view
-        homeCheckListAdapter = new HomeCheckListAdapter(context, checkListArrayList, this::onSingleCheckListClick);
+        homeCheckListAdapter = new HomeCheckListAdapter(context, checkListArrayList, this);
         rvCheckList.setAdapter(homeCheckListAdapter);
 
         ivAddToList.setOnClickListener(new View.OnClickListener() {
@@ -54,18 +63,26 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
             }
         });
 
+        ivLogout = findViewById(R.id.ivLogout);
+        ivLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuthManger.signOutUser(context);
+            }
+        });
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        refreshUi();
+        refreshCheckListUi();
     }
 
-    public void refreshUi() {
+    public void refreshCheckListUi() {
 
-        FirebaseDbManger.retrieveAllCheckLists(context, new FirebaseDbManger.FirebaseDbCallbackInterface() {
+        String userId = UserAccountManager.getUserId(context);
+        FirebaseDbManger.retrieveAllUserCheckLists(context, userId, new FirebaseDbManger.FirebaseDbCallbackInterface() {
             @Override
             public void onComplete(Object object) {
                 if (object == null){
@@ -84,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
                     checkListArrayList.clear();
                     checkListArrayList.addAll(checkListArray);
                     homeCheckListAdapter.notifyDataSetChanged();
+                    rvCheckList.scrollToPosition(checkListArrayList.size() - 1);
                 }
             }
 
@@ -99,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
         });
 
     }
+    private Intent intent;
     // on checklist click implementation
     //    go to edit screen with data
     @Override
@@ -107,10 +126,35 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
         String checkListTopicName = homeCheckListModel.getCheckListTopicName();
         String checkListDate = homeCheckListModel.getDate();
         String date = homeCheckListModel.getDate();
-        Intent intent = new Intent(context, EditTask.class);
+        intent = new Intent(context, EditTask.class);
         intent.putExtra("C_KEY_CHECKLIST_ID", checkListId);
         intent.putExtra("C_KEY_CHECKLIST_TOPIC_NAME", checkListTopicName);
         intent.putExtra("C_KEY_CHECKLIST_DATE", checkListDate);
         startActivity(intent);
+    }
+
+    @Override
+    public void onSingleLongClickDelete(HomeCheckListModel homeCheckListModel) {
+        FirebaseDbManger.deleteCheckList(context, homeCheckListModel, new FirebaseDbManger.FirebaseDbCallbackInterface() {
+            @Override
+            public void onComplete(Object object) {
+//                Intent intent = getIntent();
+                intent.removeExtra(C_KEY_CHECKLIST_ID);
+                intent.removeExtra(C_KEY_CHECKLIST_TOPIC_NAME);
+                intent.removeExtra(C_KEY_CHECKLIST_DATE);
+
+                Toast.makeText(context, "Checklist Deleted", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError() {
+                Toast.makeText(context, "Failed to delete", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancel() {
+                Toast.makeText(context, "Failed to delete", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

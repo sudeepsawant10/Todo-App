@@ -17,6 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="4"
+            android:textStyle="bold"
+            android:inputType="textCapSentences"
             android:id="@+id/etCheckListTopicName"
             android:hint="Enter checklist name"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
@@ -62,7 +64,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/etCheckListTask"
-                android:hint="Add check list"/>
+                android:inputType="textCapSentences"
+                android:hint="Add Task"/>
 
         </com.google.android.material.textfield.TextInputLayout>
         <Button
@@ -72,9 +75,10 @@
             android:id="@+id/btnAddTask"
             android:layout_gravity="center"
             android:text="+"
+            android:textStyle="bold"
             android:textColor="@color/white"
             android:background="@color/purple_500"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:layout_margin="@dimen/dimen_4dp"
             android:padding="@dimen/dimen_4dp"/>
     </LinearLayout>
@@ -83,7 +87,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="@dimen/dimen_4dp"
-        android:id="@+id/recyclerView"/>
+        android:id="@+id/rvTaskList"/>
 
 
 

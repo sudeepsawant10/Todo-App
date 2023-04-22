@@ -1,7 +1,6 @@
 package com.sudeep.todoapp.firebase;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -9,13 +8,21 @@ import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sudeep.todoapp.User;
+import com.sudeep.todoapp.edit.EditTaskModel;
 import com.sudeep.todoapp.home.HomeCheckListModel;
 import com.sudeep.todoapp.util.Common;
+import com.sudeep.todoapp.util.PreferenceHelper;
+
+import org.json.JSONObject;
+
+import java.util.Map;
 
 public class FirebaseDbManger {
     // Get instance of firebaseDb to access it from app
@@ -37,8 +44,8 @@ public class FirebaseDbManger {
     }
 
     // On edit screen use
-    public static void addCheckListToDb(Context context, String randomId_checkListName_string, HomeCheckListModel checkListModel, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
-        getReference(Common.CL_TX_CHECKLISTS).child(randomId_checkListName_string).setValue((checkListModel))
+    public static void addCheckListToDb(Context context, String randomIdChecklist, HomeCheckListModel checkListModel, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
+        getReference(Common.CL_TX_CHECKLISTS).child(randomIdChecklist).setValue((checkListModel))
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -58,8 +65,8 @@ public class FirebaseDbManger {
                 });
     }
 
-    public static void retrieveAllCheckLists(Context context, FirebaseDbCallbackInterface firebaseDbCallbackInterface){
-        getReference(Common.CL_TX_CHECKLISTS).addValueEventListener(new ValueEventListener() {
+    public static void retrieveAllUserCheckLists(Context context, String userId, FirebaseDbCallbackInterface firebaseDbCallbackInterface){
+        getReference(Common.CL_TX_CHECKLISTS).orderByChild("user_id").equalTo(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 long count = snapshot.getChildrenCount();
@@ -68,6 +75,134 @@ public class FirebaseDbManger {
                 }
                 else {
                     firebaseDbCallbackInterface.onComplete(null);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                firebaseDbCallbackInterface.onCancel();
+            }
+        });
+    }
+
+    public static void addTaskToDb(Context context, String checkListId, EditTaskModel editTaskModel, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
+        String checkListTaskReference = checkListId+"_tasks";
+        getReference(Common.CL_TX_CHECKLISTS).child(checkListId).child(checkListTaskReference).child(String.valueOf(editTaskModel.getTask_id()))
+                .setValue((editTaskModel)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        firebaseDbCallbackInterface.onComplete(null);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        firebaseDbCallbackInterface.onError();
+                    }
+                }).addOnCanceledListener(new OnCanceledListener() {
+                    @Override
+                    public void onCanceled() {
+                        firebaseDbCallbackInterface.onCancel();
+                    }
+                });
+    }
+
+    public static void retrieveAllCheckListTasks(Context context, String checkListId, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
+        String checkListTaskReference = checkListId+"_tasks";
+        getReference(Common.CL_TX_CHECKLISTS).child(checkListId).child(checkListTaskReference)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        long count = snapshot.getChildrenCount();
+                        if (count > 0) {
+                            firebaseDbCallbackInterface.onComplete(snapshot.getChildren());
+                        }
+                        else {
+                            firebaseDbCallbackInterface.onComplete(null);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        firebaseDbCallbackInterface.onCancel();
+                    }
+                });
+    }
+
+    public static void deleteCheckList(Context context, HomeCheckListModel homeCheckListModel, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
+        String checkListIdReference = String.valueOf(homeCheckListModel.getCheckListId());
+        getReference(Common.CL_TX_CHECKLISTS).child(checkListIdReference).
+                removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        firebaseDbCallbackInterface.onComplete(null);
+                    }
+                })
+                .addOnCanceledListener(new OnCanceledListener() {
+                    @Override
+                    public void onCanceled() {
+                        firebaseDbCallbackInterface.onError();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        firebaseDbCallbackInterface.onCancel();
+                    }
+                });
+    }
+
+    public static void markTaskDone(Context context, String checkListId, EditTaskModel editTask, Boolean isDone, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
+        String checkListTaskReference = checkListId+"_tasks";
+        getReference(Common.CL_TX_CHECKLISTS).child(checkListId).child(checkListTaskReference)
+                .child(String.valueOf(editTask.getTask_id())).child("taskDone").setValue(isDone)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        firebaseDbCallbackInterface.onComplete(task);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        firebaseDbCallbackInterface.onError();
+                    }
+                }).addOnCanceledListener(new OnCanceledListener() {
+                    @Override
+                    public void onCanceled() {
+                        firebaseDbCallbackInterface.onCancel();
+                    }
+                });
+    }
+
+    public static void addUserToDb(Context context, FirebaseUser firebaseUser, User user, FirebaseDbCallbackInterface firebaseDbCallbackInterface) {
+        getReference(Common.CL_TX_USERS).child(firebaseUser.getUid()).setValue((user)).
+                addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        firebaseDbCallbackInterface.onComplete(null);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        firebaseDbCallbackInterface.onError();
+                    }
+                }).addOnCanceledListener(new OnCanceledListener() {
+                    @Override
+                    public void onCanceled() {
+                        firebaseDbCallbackInterface.onCancel();
+                    }
+                });
+    }
+
+    public static void getUserFromDb(Context context, String user_id, FirebaseDbCallbackInterface firebaseDbCallbackInterface){
+        getReference(Common.CL_TX_USERS).child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                try {
+                    JSONObject jsonObject = new JSONObject((Map) snapshot.getValue());
+                    PreferenceHelper.putString(context, Common.C_KEY_APP_LOGIN_VALUES, jsonObject.toString());
+                    firebaseDbCallbackInterface.onComplete(null);
+                }
+                catch (Exception e) {
+                    firebaseDbCallbackInterface.onCancel();
                 }
             }
 

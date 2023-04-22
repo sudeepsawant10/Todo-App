@@ -1,12 +1,15 @@
 package com.sudeep.todoapp.home;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +24,7 @@ public class HomeCheckListAdapter extends RecyclerView.Adapter {
     private ArrayList<HomeCheckListModel> checkListArrayList = new ArrayList<>();
 //    we have declare the listener method in this class so do not impelment
     private OnSingleCheckListClickListener onSingleCheckListClickListener;
+
 
     public HomeCheckListAdapter(Context context, ArrayList<HomeCheckListModel> checkListArrayList, OnSingleCheckListClickListener onSingleCheckListClickListener) {
         this.context = context;
@@ -51,6 +55,31 @@ public class HomeCheckListAdapter extends RecyclerView.Adapter {
                 onSingleCheckListClickListener.onSingleCheckListClick(homeCheckListModel);
             }
         });
+        homeCheckListViewHolder.llCheckListEdit.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                String checkListName = checkListArrayList.get(position).getCheckListTopicName();
+                new AlertDialog.Builder(context)
+                        .setTitle("Delete entry")
+                        .setMessage("Are you sure you want to delete this entry?" + "\n"+checkListName)
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                checkListArrayList.remove(position);
+                                notifyItemRemoved(position);
+                                onSingleCheckListClickListener.onSingleLongClickDelete(homeCheckListModel);
+
+                            }
+                        })
+
+// A null listener allows the button to dismiss the dialog and take no further action.
+                        .setNegativeButton("cancel", null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+                return true;
+            }
+        });
+
     }
 
     @Override
@@ -75,9 +104,10 @@ public class HomeCheckListAdapter extends RecyclerView.Adapter {
     }
 
     // click listener for every checklist
-    public interface OnSingleCheckListClickListener {
+    public interface  OnSingleCheckListClickListener {
 //      To get the checklist data using HomeCheckListModel
         public void onSingleCheckListClick(HomeCheckListModel homeCheckListModel);
+        public void onSingleLongClickDelete(HomeCheckListModel homeCheckListModel);
     }
 
 }
