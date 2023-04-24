@@ -21,15 +21,18 @@ import com.sudeep.todoapp.SignupActivity;
 import com.sudeep.todoapp.edit.EditTask;
 import com.sudeep.todoapp.firebase.FirebaseAuthManger;
 import com.sudeep.todoapp.firebase.FirebaseDbManger;
+import com.sudeep.todoapp.util.AbstractAppActivity;
 import com.sudeep.todoapp.util.Common;
 import com.sudeep.todoapp.util.PreferenceHelper;
 import com.sudeep.todoapp.util.UserAccountManager;
+import com.sudeep.todoapp.util.AbstractAppActivity;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements HomeCheckListAdapter.OnSingleCheckListClickListener {
 
     private Context context = this;
+    private Context context2;
     private ImageView ivAddToList;
     private RecyclerView rvCheckList;
     private HomeCheckListAdapter homeCheckListAdapter;
@@ -82,9 +85,12 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
     public void refreshCheckListUi() {
 
         String userId = UserAccountManager.getUserId(context);
+        AbstractAppActivity myactivity = new AbstractAppActivity();
+        myactivity.showProgressBarDialog(context,"Please wait","Retrieving your blogs");
         FirebaseDbManger.retrieveAllUserCheckLists(context, userId, new FirebaseDbManger.FirebaseDbCallbackInterface() {
             @Override
             public void onComplete(Object object) {
+                myactivity.hideProgressBarDialog();
                 if (object == null){
                     Toast.makeText(context, "No checklist exists", Toast.LENGTH_SHORT).show();
                 } else {
@@ -107,12 +113,12 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
 
             @Override
             public void onError() {
-
+                myactivity.hideProgressBarDialog();
             }
 
             @Override
             public void onCancel() {
-
+                myactivity.hideProgressBarDialog();
             }
         });
 
