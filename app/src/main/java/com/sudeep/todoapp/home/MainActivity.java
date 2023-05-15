@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
 
         String userId = UserAccountManager.getUserId(context);
         AbstractAppActivity myactivity = new AbstractAppActivity();
-        myactivity.showProgressBarDialog(context,"Please wait","Retrieving your blogs");
         FirebaseDbManger.retrieveAllUserCheckLists(context, userId, new FirebaseDbManger.FirebaseDbCallbackInterface() {
             @Override
             public void onComplete(Object object) {
@@ -113,12 +112,12 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
 
             @Override
             public void onError() {
-                myactivity.hideProgressBarDialog();
+
             }
 
             @Override
             public void onCancel() {
-                myactivity.hideProgressBarDialog();
+
             }
         });
 
