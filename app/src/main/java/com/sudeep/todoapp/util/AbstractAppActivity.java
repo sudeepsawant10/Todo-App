@@ -18,42 +18,43 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.sudeep.todoapp.R;
 
-public class AbstractAppActivity  {
+public abstract class AbstractAppActivity extends AppCompatActivity {
 
     private BroadcastReceiver receiver;
     private boolean avoidFirstTimeWhenInternet = true;
-    private Dialog appWhenNoDataDialog,appShowProgressBar;
-    private boolean isLoadingDoneFirstTime = false;
+//    private Dialog appWhenNoDataDialog,appShowProgressBar;
+//    private boolean isLoadingDoneFirstTime = false;
 
-//    @Override
-//    protected void onCreate(@Nullable Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-////        initReceiver();
-//    }
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+//      for network status
+        initReceiver();
+    }
 
-//    private void initReceiver() {
-//        receiver = new BroadcastReceiver() {
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//                if(NetworkUtilities.isNetworkAvailable(context)) {
-//                    if(avoidFirstTimeWhenInternet){
-//                        avoidFirstTimeWhenInternet = false;
-//                        return;
-//                    }
-//                    whenInternet();
-//                } else {
-//                    avoidFirstTimeWhenInternet = false;
-//                    whenNoInternet();
-//                }
-//            }
-//        };
-//        IntentFilter intentFilter = new IntentFilter();
-//        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-//        registerReceiver(receiver,intentFilter);
-//    }
-//
-//    public abstract void whenInternet();
-//    public abstract void whenNoInternet();
+    private void initReceiver() {
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(NetworkUtilities.isNetworkAvailable(context)) {
+                    if(avoidFirstTimeWhenInternet){
+                        avoidFirstTimeWhenInternet = false;
+                        return;
+                    }
+                    whenInternet();
+                } else {
+                    avoidFirstTimeWhenInternet = false;
+                    whenNoInternet();
+                }
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(receiver,intentFilter);
+    }
+
+    public abstract void whenInternet();
+    public abstract void whenNoInternet();
 
 //    public void showNoDataDialog(Context context) {
 //        if(appWhenNoDataDialog == null){
@@ -79,38 +80,38 @@ public class AbstractAppActivity  {
 //        }
 //    }
 
-    public void showProgressBarDialog(Context context, String title, String msg) {
-        if(appShowProgressBar == null){
-            appShowProgressBar = new Dialog(context);
-            appShowProgressBar.setCancelable(false);
-            appShowProgressBar.setContentView(R.layout.lottie_login_animation);
-            appShowProgressBar.setTitle(context.getString(R.string.app_name));
-
-            Window window = appShowProgressBar.getWindow();
-            window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        }
-        TextView tvProgressTitle = appShowProgressBar.findViewById(R.id.tvProgressTitle);
-        tvProgressTitle.setText(title);
-        TextView tvProgressMsg = appShowProgressBar.findViewById(R.id.tvProgressMsg);
-        tvProgressMsg.setText(msg);
-        if(!appShowProgressBar.isShowing() && !isLoadingDoneFirstTime){
-            appShowProgressBar.show();
-            isLoadingDoneFirstTime = true;
-        }
-    }
-
-    public void hideProgressBarDialog() {
-        if(appShowProgressBar != null && appShowProgressBar.isShowing()) {
-            appShowProgressBar.hide();
-        }
-    }
-
-    public void hideNoDataDialog() {
-        if(appWhenNoDataDialog != null && appWhenNoDataDialog.isShowing()) {
-            appWhenNoDataDialog.hide();
-        }
-    }
+//    public void showProgressBarDialog(Context context, String title, String msg) {
+//        if(appShowProgressBar == null){
+//            appShowProgressBar = new Dialog(context);
+//            appShowProgressBar.setCancelable(false);
+//            appShowProgressBar.setContentView(R.layout.lottie_login_animation);
+//            appShowProgressBar.setTitle(context.getString(R.string.app_name));
+//
+//            Window window = appShowProgressBar.getWindow();
+//            window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//
+//        }
+//        TextView tvProgressTitle = appShowProgressBar.findViewById(R.id.tvProgressTitle);
+//        tvProgressTitle.setText(title);
+//        TextView tvProgressMsg = appShowProgressBar.findViewById(R.id.tvProgressMsg);
+//        tvProgressMsg.setText(msg);
+//        if(!appShowProgressBar.isShowing() && !isLoadingDoneFirstTime){
+//            appShowProgressBar.show();
+//            isLoadingDoneFirstTime = true;
+//        }
+//    }
+//
+//    public void hideProgressBarDialog() {
+//        if(appShowProgressBar != null && appShowProgressBar.isShowing()) {
+//            appShowProgressBar.hide();
+//        }
+//    }
+//
+//    public void hideNoDataDialog() {
+//        if(appWhenNoDataDialog != null && appWhenNoDataDialog.isShowing()) {
+//            appWhenNoDataDialog.hide();
+//        }
+//    }
 
 //    protected abstract void refreshUI();
 
@@ -120,7 +121,7 @@ public class AbstractAppActivity  {
 //        unregisterReceiver(receiver);
 //    }
 
-    public void forceToRenderAgain() {
-        isLoadingDoneFirstTime = false;
-    }
+//    public void forceToRenderAgain() {
+//        isLoadingDoneFirstTime = false;
+//    }
 }

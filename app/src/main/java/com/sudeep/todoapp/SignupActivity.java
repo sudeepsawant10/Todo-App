@@ -12,9 +12,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sudeep.todoapp.firebase.FirebaseAuthManger;
+import com.sudeep.todoapp.util.AbstractAppActivity;
 import com.sudeep.todoapp.util.ValidationHelper;
 
-public class SignupActivity extends AppCompatActivity {
+public class SignupActivity extends AbstractAppActivity {
     private Context context = this;
     private EditText etSignUpFirstName, etSignUpLastName, etSignUpEmail, etSignUpPassword1, etSignUpPassword2;
     private TextView tvGoToLogin;
@@ -71,5 +72,16 @@ public class SignupActivity extends AppCompatActivity {
                 startActivity(new Intent(context, LoginActivity.class));
             }
         });
+    }
+    @Override
+    public void whenInternet() {
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+    }
+
+    @Override
+    public void whenNoInternet() {
+        setContentView(R.layout.lottie_no_internet);
     }
 }

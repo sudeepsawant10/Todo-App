@@ -29,7 +29,7 @@ import com.sudeep.todoapp.util.AbstractAppActivity;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements HomeCheckListAdapter.OnSingleCheckListClickListener {
+public class MainActivity extends AbstractAppActivity implements HomeCheckListAdapter.OnSingleCheckListClickListener {
 
     private Context context = this;
     private Context context2;
@@ -77,6 +77,18 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
     }
 
     @Override
+    public void whenInternet() {
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+    }
+
+    @Override
+    public void whenNoInternet() {
+        setContentView(R.layout.lottie_no_internet);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         refreshCheckListUi();
@@ -85,11 +97,10 @@ public class MainActivity extends AppCompatActivity implements HomeCheckListAdap
     public void refreshCheckListUi() {
 
         String userId = UserAccountManager.getUserId(context);
-        AbstractAppActivity myactivity = new AbstractAppActivity();
         FirebaseDbManger.retrieveAllUserCheckLists(context, userId, new FirebaseDbManger.FirebaseDbCallbackInterface() {
             @Override
             public void onComplete(Object object) {
-                myactivity.hideProgressBarDialog();
+//                myactivity.hideProgressBarDialog();
                 if (object == null){
                     Toast.makeText(context, "No checklist exists", Toast.LENGTH_SHORT).show();
                 } else {

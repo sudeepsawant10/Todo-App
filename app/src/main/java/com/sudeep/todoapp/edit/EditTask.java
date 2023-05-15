@@ -28,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.sudeep.todoapp.R;
 import com.sudeep.todoapp.firebase.FirebaseDbManger;
 import com.sudeep.todoapp.home.HomeCheckListModel;
+import com.sudeep.todoapp.util.AbstractAppActivity;
 import com.sudeep.todoapp.util.UserAccountManager;
 import com.sudeep.todoapp.util.ValidationHelper;
 
@@ -38,7 +39,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class EditTask extends AppCompatActivity implements EditTaskAdaptor.OnTaskCheckedClickListener{
+public class EditTask extends AbstractAppActivity implements EditTaskAdaptor.OnTaskCheckedClickListener{
     private static final String TAG = "EDITTASK_ACTIVITY";
     private Context context = this;
     private EditText etCheckListTopicName, etCheckListTask;
@@ -270,5 +271,18 @@ public class EditTask extends AppCompatActivity implements EditTaskAdaptor.OnTas
         // convert id from StringBuilder to String
         randomId_checkListName_string = String.valueOf(randomId_checkListName);
         return randomId_checkListName_string;
+    }
+
+    @Override
+    public void whenInternet() {
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+    }
+
+    @Override
+    public void whenNoInternet() {
+        finish();
+        setContentView(R.layout.lottie_no_internet);
     }
 }

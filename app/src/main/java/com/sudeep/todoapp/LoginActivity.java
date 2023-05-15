@@ -13,9 +13,10 @@ import android.widget.Toast;
 
 import com.sudeep.todoapp.firebase.FirebaseAuthManger;
 import com.sudeep.todoapp.firebase.FirebaseDbManger;
+import com.sudeep.todoapp.util.AbstractAppActivity;
 import com.sudeep.todoapp.util.ValidationHelper;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AbstractAppActivity {
     private Context context = this;
     private EditText etLoginEmail, etLoginPassword;
     private Button btnLogin;
@@ -54,5 +55,16 @@ public class LoginActivity extends AppCompatActivity {
                 
             }
         });
+    }
+    @Override
+    public void whenInternet() {
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+    }
+
+    @Override
+    public void whenNoInternet() {
+        setContentView(R.layout.lottie_no_internet);
     }
 }
