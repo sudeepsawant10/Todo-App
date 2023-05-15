@@ -91,16 +91,22 @@ public class MainActivity extends AbstractAppActivity implements HomeCheckListAd
     @Override
     protected void onResume() {
         super.onResume();
+        refreshUI();
+    }
+
+    @Override
+    protected void refreshUI() {
         refreshCheckListUi();
     }
 
     public void refreshCheckListUi() {
 
         String userId = UserAccountManager.getUserId(context);
+        showProgressBarDialog(context, "Please wait", "Loading your checklists");
         FirebaseDbManger.retrieveAllUserCheckLists(context, userId, new FirebaseDbManger.FirebaseDbCallbackInterface() {
             @Override
             public void onComplete(Object object) {
-//                myactivity.hideProgressBarDialog();
+                hideProgressBarDialog();
                 if (object == null){
                     Toast.makeText(context, "No checklist exists", Toast.LENGTH_SHORT).show();
                 } else {
@@ -123,12 +129,12 @@ public class MainActivity extends AbstractAppActivity implements HomeCheckListAd
 
             @Override
             public void onError() {
-
+                hideProgressBarDialog();
             }
 
             @Override
             public void onCancel() {
-
+                hideProgressBarDialog();
             }
         });
 

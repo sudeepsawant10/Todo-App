@@ -43,4 +43,9 @@ public class LauncherActivity extends AbstractAppActivity {
     public void whenNoInternet() {
         setContentView(R.layout.lottie_no_internet);
     }
+
+    @Override
+    protected void refreshUI() {
+
+    }
 }

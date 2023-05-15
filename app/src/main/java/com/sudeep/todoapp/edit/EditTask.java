@@ -285,4 +285,9 @@ public class EditTask extends AbstractAppActivity implements EditTaskAdaptor.OnT
         finish();
         setContentView(R.layout.lottie_no_internet);
     }
+
+    @Override
+    protected void refreshUI() {
+
+    }
 }

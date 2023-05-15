@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.sudeep.todoapp.LoginActivity;
 import com.sudeep.todoapp.User;
 import com.sudeep.todoapp.home.MainActivity;
+import com.sudeep.todoapp.util.AbstractAppActivity;
 import com.sudeep.todoapp.util.Common;
 import com.sudeep.todoapp.util.PreferenceHelper;
 
@@ -26,18 +27,21 @@ public class FirebaseAuthManger {
 
 
     public static void signUpUser(Context context, User user, String password1) {
+        ((AbstractAppActivity)context).showProgressBarDialog(context, "Please wait", "Signing up...");
         firebaseAuth.createUserWithEmailAndPassword(user.getEmail(), password1)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()){
                             //sign in success update user data in db
+
                             FirebaseUser firebaseUser =firebaseAuth.getCurrentUser();
                             user.setUser_id(firebaseUser.getUid());
 
                             FirebaseDbManger.addUserToDb(context, firebaseUser, user, new FirebaseDbManger.FirebaseDbCallbackInterface() {
                                 @Override
                                 public void onComplete(Object object) {
+                                    ((AbstractAppActivity)context).hideProgressBarDialog();
                                     Toast.makeText(context, "Signup successful", Toast.LENGTH_SHORT).show();
                                     context.startActivity(new Intent(context, LoginActivity.class));
                                     ((Activity) context).finish();
@@ -45,11 +49,13 @@ public class FirebaseAuthManger {
 
                                 @Override
                                 public void onError() {
+                                    ((AbstractAppActivity)context).hideProgressBarDialog();
                                     Toast.makeText(context, "Signup failed!", Toast.LENGTH_SHORT).show();
                                 }
 
                                 @Override
                                 public void onCancel() {
+                                    ((AbstractAppActivity)context).hideProgressBarDialog();
                                     Toast.makeText(context, "Signup failed!", Toast.LENGTH_SHORT).show();
                                 }
                             });
@@ -57,6 +63,7 @@ public class FirebaseAuthManger {
                         else {
 //                           if user already exists in db
                             Exception exception = task.getException();
+                            ((AbstractAppActivity)context).hideProgressBarDialog();
                             if (exception instanceof FirebaseAuthUserCollisionException){
                                 Toast.makeText(context, "Account already exists!", Toast.LENGTH_SHORT).show();
                             }
@@ -70,6 +77,7 @@ public class FirebaseAuthManger {
     }
 
     public static void loginUser(Context context, String email, String password) {
+        ((AbstractAppActivity)context).showProgressBarDialog(context, "Please wait!", "Logging...");
         firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -78,6 +86,7 @@ public class FirebaseAuthManger {
                     FirebaseDbManger.getUserFromDb(context, firebaseUser.getUid(), new FirebaseDbManger.FirebaseDbCallbackInterface() {
                         @Override
                         public void onComplete(Object object) {
+                            ((AbstractAppActivity)context).hideProgressBarDialog();
                             Toast.makeText(context, "Sign in successful", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(context, MainActivity.class);
                             context.startActivity(intent);
@@ -87,11 +96,13 @@ public class FirebaseAuthManger {
 
                         @Override
                         public void onError() {
+                            ((AbstractAppActivity)context).hideProgressBarDialog();
                             Toast.makeText(context, "Sign in failed!", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
                         public void onCancel() {
+                            ((AbstractAppActivity)context).hideProgressBarDialog();
                             Toast.makeText(context, "Sign in failed", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -99,6 +110,7 @@ public class FirebaseAuthManger {
                 else {
 //                    for invalid user case
                     Exception exception = task.getException();
+                    ((AbstractAppActivity)context).hideProgressBarDialog();
                     if (exception instanceof FirebaseAuthInvalidUserException){
                         Toast.makeText(context, "User not found!", Toast.LENGTH_SHORT).show();
                     }

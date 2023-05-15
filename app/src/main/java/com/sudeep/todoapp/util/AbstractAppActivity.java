@@ -22,8 +22,8 @@ public abstract class AbstractAppActivity extends AppCompatActivity {
 
     private BroadcastReceiver receiver;
     private boolean avoidFirstTimeWhenInternet = true;
-//    private Dialog appWhenNoDataDialog,appShowProgressBar;
-//    private boolean isLoadingDoneFirstTime = false;
+    private Dialog appWhenNoDataDialog,appShowProgressBar;
+    private boolean isLoadingDoneFirstTime = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,48 +80,48 @@ public abstract class AbstractAppActivity extends AppCompatActivity {
 //        }
 //    }
 
-//    public void showProgressBarDialog(Context context, String title, String msg) {
-//        if(appShowProgressBar == null){
-//            appShowProgressBar = new Dialog(context);
-//            appShowProgressBar.setCancelable(false);
-//            appShowProgressBar.setContentView(R.layout.lottie_login_animation);
-//            appShowProgressBar.setTitle(context.getString(R.string.app_name));
-//
-//            Window window = appShowProgressBar.getWindow();
-//            window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//
-//        }
-//        TextView tvProgressTitle = appShowProgressBar.findViewById(R.id.tvProgressTitle);
-//        tvProgressTitle.setText(title);
-//        TextView tvProgressMsg = appShowProgressBar.findViewById(R.id.tvProgressMsg);
-//        tvProgressMsg.setText(msg);
-//        if(!appShowProgressBar.isShowing() && !isLoadingDoneFirstTime){
-//            appShowProgressBar.show();
-//            isLoadingDoneFirstTime = true;
-//        }
-//    }
-//
-//    public void hideProgressBarDialog() {
-//        if(appShowProgressBar != null && appShowProgressBar.isShowing()) {
-//            appShowProgressBar.hide();
-//        }
-//    }
-//
+    public void showProgressBarDialog(Context context, String title, String msg) {
+        if(appShowProgressBar == null){
+            appShowProgressBar = new Dialog(context);
+            appShowProgressBar.setCancelable(false);
+            appShowProgressBar.setContentView(R.layout.lottie_login_animation);
+            appShowProgressBar.setTitle(context.getString(R.string.app_name));
+
+            Window window = appShowProgressBar.getWindow();
+            window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        }
+        TextView tvProgressTitle = appShowProgressBar.findViewById(R.id.tvProgressTitle);
+        tvProgressTitle.setText(title);
+        TextView tvProgressMsg = appShowProgressBar.findViewById(R.id.tvProgressMsg);
+        tvProgressMsg.setText(msg);
+        if(!appShowProgressBar.isShowing() && !isLoadingDoneFirstTime){
+            appShowProgressBar.show();
+            isLoadingDoneFirstTime = true;
+        }
+    }
+
+    public void hideProgressBarDialog() {
+        if(appShowProgressBar != null && appShowProgressBar.isShowing()) {
+            appShowProgressBar.hide();
+        }
+    }
+
 //    public void hideNoDataDialog() {
 //        if(appWhenNoDataDialog != null && appWhenNoDataDialog.isShowing()) {
 //            appWhenNoDataDialog.hide();
 //        }
 //    }
 
-//    protected abstract void refreshUI();
+    protected abstract void refreshUI();
 
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        unregisterReceiver(receiver);
-//    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
+    }
 
-//    public void forceToRenderAgain() {
-//        isLoadingDoneFirstTime = false;
-//    }
+    public void forceToRenderAgain() {
+        isLoadingDoneFirstTime = false;
+    }
 }
